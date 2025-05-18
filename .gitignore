@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / dependency files
+*.luac
+
+# Pico-8 cartridge exports
+*.p8.rom
+*.p8.png.gif
+*.p8.rom.gif
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# macOS system files
+.DS_Store
+
+# VSCode and editor files
+.vscode/
+*.code-workspace
+*.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node modules (if you use any tools)
+node_modules/
+
+# Other
+dist/
+build/
