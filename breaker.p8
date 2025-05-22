@@ -1,0 +1,176 @@
+pico-8 cartridge // http://www.pico-8.com
+version 42
+__lua__
+--breaker
+--m.ivkovic (whippet)
+
+function _init()
+	playing=true
+	win=false
+ make_ball()
+ make_paddle()
+ make_brick(10)
+end
+
+function _update()
+	if playing then
+  update_ball()
+  update_paddle()
+  update_bricks()
+ end
+ if (btnp(❎)) _init()
+end
+
+function _draw()
+ cls()
+ draw_ball()
+ draw_paddle()
+ draw_bricks()
+ if not playing then
+  cls()
+  if win then
+   print("winner",55,50,3)
+  else
+   print("game over",45,50,3)
+  end
+  print("press ❎ to play again",25,60,6)
+ end
+end
+
+-->8
+--ball
+
+function make_ball()
+ ball = {}
+ ball.radius = 1
+ ball.x = flr(rnd(0,128))
+ ball.y = flr(rnd(0,10))
+ ball.vx = rnd(2,3)
+ ball.vy = rnd(5,9)
+end
+
+function check_collision_paddle()
+ if ball.x + ball.radius >= p.x and
+  ball.x - ball.radius <= p.x + p.width and
+  ball.y + ball.radius >= p.y and
+  ball.y - ball.radius <= p.y + 4 then
+  sfx(0)
+  return true
+ end
+ return false
+end
+
+function check_collision_brick(b)
+ if ball.x + ball.radius >= b.x and
+  ball.x - ball.radius <= b.x + b.l and
+  ball.y + ball.radius >= b.y and
+  ball.y - ball.radius <= b.y + b.h then
+  sfx(1)
+  return true
+ end
+ return false
+end
+
+function update_ball()
+ ball.x += ball.vx
+ ball.y += ball.vy
+ if ball.x < 0+ball.radius then
+  ball.x = 0+ball.radius
+  ball.vx = -ball.vx*1.02
+ end
+  if ball.x > 128-ball.radius then
+   ball.x = 128-ball.radius
+   ball.vx = -ball.vx*1.02
+  end
+  if ball.y < 0+ball.radius then
+   ball.y = 0+ball.radius
+   ball.vy = -ball.vy*1.02
+  end
+  if ball.y > 128-ball.radius then
+   sfx(2)
+   playing=false
+  end
+  if check_collision_paddle() then
+   ball.vy = -ball.vy
+  end
+end
+
+function draw_ball()
+ circfill(ball.x,ball.y,ball.radius)
+end
+-->8
+--paddle
+
+function make_paddle()
+ p={}
+ p.x=60
+ p.y=120
+ p.width=20
+
+end
+
+function update_paddle()
+ if btn(⬅️) then
+  p.x-=2
+ end
+ if btn(➡️) then
+  p.x+=2
+ end
+end
+
+function draw_paddle()
+ line(p.x,p.y,p.x+p.width,p.y)
+end
+-->8
+--bricks
+
+bricks={}
+
+function make_brick(n)
+ for i=1, n do
+  local b={}
+  b.x=20+(i*7)
+  b.y=30
+  b.h=3
+  b.l=5
+
+  add(bricks,b)
+ end
+end
+
+function draw_bricks()
+ for i=1, #bricks do
+  rectfill(bricks[i].x,bricks[i].y,bricks[i].x+bricks[i].l,bricks[i].y+bricks[i].h)
+ end
+end
+
+function update_bricks()
+ for i=#bricks,1,-1 do
+ local brick = bricks[i]
+  if check_collision_brick(brick) then
+   del(bricks,brick)
+   check_win()
+  end
+ end
+end
+
+function check_win()
+ if #bricks<1 then
+ 	sfx(3)
+ 	win=true
+ 	playing=false
+ end
+end
+
+__gfx__
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00700700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00077000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00077000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00700700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+__sfx__
+310100001e55220552225522355200502005020050200502005020050200502005020050200502005020050200502005020050200502005020050200502005020050200502005020050200502005020050200502
+770400000e657176473a6270060700607006070060700607006070060702607006070060700607006070060700607006070060700607006070060700607006070060700607006070060700607006070060700607
+490a00001d754177540d7440873401734007240070400704007040070400704007040070400704007040070400704007040070400704007040070400704007040070400704007040070400704007040070400704
+561200001c555135552155510555245550c5551f555095551755504555245552f555105551c555155551a5551755523555115551c55507555135550455523555115551d5550c5551055507555175550b5551c555
