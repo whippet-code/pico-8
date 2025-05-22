@@ -5,8 +5,8 @@ __lua__
 --m.ivkovic (whippet)
 
 function _init()
-	_ugm=update_game
-	_dgm=draw_game
+	_ugm=update_start
+	_dgm=draw_start
 	
 	aliens={}
 	make_alien(5)
@@ -34,6 +34,14 @@ end
 -->8
 --update
 
+function update_start()
+	_ugm=_init
+	if btnp(❎) then 
+		_ugm=update_game
+		_dgm=draw_game
+	end
+end
+
 function update_game()
 	for i=1,#aliens do
 		local a=aliens[i]
@@ -42,8 +50,17 @@ function update_game()
 	update_player()
 	update_bullets()
 end
+
+function update_gameover()
+
+end
 -->8
 --draw
+
+function draw_start()
+	print("🐱 invader like ★",30,40,4)
+	print("press ❎ to play",33,60,6)
+end
 
 function draw_game()
 	for i=1, #aliens do
@@ -53,6 +70,10 @@ function draw_game()
 	
 	draw_player()
 	draw_bullets()
+end
+
+function draw_gameover()
+
 end
 -->8
 --aliens
