@@ -9,7 +9,7 @@ function _init()
 	_dgm=draw_start
 	
 	aliens={}
-	make_alien(5)
+	make_alien(6)
 	
 	make_player()
 	bullets={}
@@ -20,10 +20,11 @@ end
 
 function _update()
 	_ugm()
-	if track<60 then
+	if track<30 then
 		track+=1
 	else
 		track=0
+		dir*=-1
 	end
 end
 
@@ -43,16 +44,25 @@ function update_start()
 end
 
 function update_game()
-	for i=1,#aliens do
+	for i=#aliens,1,-1 do
 		local a=aliens[i]
 		update_alien(a)
+		check_alien(a)
+	end
+	if #aliens==0 then
+		_ugm=update_win
+		sfx(4)
 	end
 	update_player()
 	update_bullets()
 end
 
 function update_gameover()
+	_dgm=draw_gameover
+end
 
+function update_win()
+	_dgm=draw_win
 end
 -->8
 --draw
@@ -73,19 +83,37 @@ function draw_game()
 end
 
 function draw_gameover()
+	cls()
+	print("ded!",40,40,6)
+end
 
+function draw_win()
+	cls()
+	print("winner",40,40,6)
 end
 -->8
 --aliens
 
 function make_alien(n)
-	for i=1, n do
+	for i=0,n-1 do
 		local a={}
-		a.x=(i*10)
+		a.x=(i*11)+4
 		a.y=4
 		a.sprite=32
 		
+		local b={}
+		b.x=(i*11)+6
+		b.y=16
+		b.sprite=33
+		
+		local c={}
+		c.x=(i*11)+4
+		c.y=28
+		c.sprite=32
+		
 		add(aliens,a)
+		add(aliens,b)
+		add(aliens,c)
 	end
 end
 
@@ -94,14 +122,37 @@ function draw_alien(a)
 end
 
 function update_alien(a)
-	if track<60 then
-		a.x+=1*dir
+	if track<30 then
+		a.x+=2*dir
 	else
-		a.y+=4
-		dir*=-1
+		a.y+=6
 		sfx(0)
 	end
 end
+
+--collsions
+function check_alien(a)
+	for j=#bullets,1,-1 do
+		local b=bullets[j]
+		if b.x>a.x and 
+			b.x<a.x+8 and
+			b.y>a.y and
+			b.y<a.y+8 then
+					
+			del(aliens,a)
+			del(bullets,b)
+			sfx(2)
+		end	
+	end
+	if a.x<=p.x+8 and
+				a.x+8>=p.x and
+				a.y+8>p.y and
+				a.y<p.y+8 then
+		_ugm=update_gameover
+	end
+end
+
+
 -->8
 --player
 
@@ -120,7 +171,7 @@ function update_player()
 		p.x+=2
 	end
 	if btnp(❎) then
-		if #bullets<5 then
+		if #bullets<3 then
 			shoot()
 			sfx(1)
 		end
@@ -164,6 +215,7 @@ function draw_bullets()
 		circfill(b.x,b.y,1)
 	end
 end
+
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -192,3 +244,9 @@ bbb00bbb0bb00bb00000000000000000000000000000000000000000000000000000000000000000
 __sfx__
 9203000002112051221f13304122001120010300103001030010300103001030010300103001030010300103001030010300103001030010300103001033f1030010300103001030010300103001030010300103
 a703000007551075513b5513255123551005010050100501005010050100501005010050100501005010050100501005010050100501005010050100501005010050100501005010050100501005010050100501
+170300000e6551a6353c6250060500605006050060500605006050060500605006050060500605006050060500605006050060500605006050060500605006050060500605006050060500605006050060500605
+50100000005231b5031762300503005230a50317623005030052313503176230050300523265031762313503005231b50317623245030052318503165031f5030052327503176231762300523176231762317623
+8c100000305222b522265322453224532145421f5321f5322c5222952226532225321f5321d532185321353224532225221f5221d5221d5221f522225221f5221f5220c5221852216522185321b5221d53218532
+__music__
+00 03424344
+
